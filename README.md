@@ -11,6 +11,9 @@ go get github.com/onsonr/motr
 ```
 
 ## Usage
+
+#### Example: As a library
+
 ```go
 package main
 import (
@@ -25,6 +28,21 @@ func main() {
 	node.Start()
 }
 ```
+
+#### Example: As a Service Worker
+
+```sh
+GOOS=js GOARCH=wasm go build -o app.wasm ./cmd/vault/main.go
+```
+
+#### Example: Via Cloudflare Workers
+
+```sh
+GOOS=js GOARCH=wasm go build -o app.wasm ./cmd/proxy/main.go
+```
+
+## Contributing
+Contributions are welcome!
 
 ## License
 [MIT](LICENSE)  
