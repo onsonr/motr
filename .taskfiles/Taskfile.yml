@@ -5,8 +5,10 @@ version: '3'
 vars:
   GREETING: Hello, World!
 
+includes:
+  es: ./ES.yml
+  go: ./Go.yml
+
 tasks:
   default:
-    cmds:
-      - echo "{{.GREETING}}"
-    silent: true
+    cmd: "task -l"

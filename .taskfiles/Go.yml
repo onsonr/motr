@@ -6,9 +6,8 @@ vars:
   GREETING: Hello, World!
 
 tasks:
-  install:
-    desc: Install the pnpm dependencies
-    dir: web/es-client
+  build:
+    desc: Build the project
     cmds:
-      - pnpm install
+      - echo "{{.GREETING}}"
     silent: true
