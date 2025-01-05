@@ -7,14 +7,17 @@ BINDIR ?= $(GOPATH)/bin
 DOCKER := $(shell which docker)
 HTTPS_GIT := github.com/onsonr/hway.git
 
+export RELEASE_DATE="$(date +%Y).$(date +%V).$(date +%u)"
 
-all: install test
+all: deps install test
+
+deps:
+	go install github.com/apple/pkl-go/cmd/pkl-gen-go@latest
+	go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
+	go install github.com/go-task/task/v3/cmd/task@latest
 
 build: go.sum
 	GOOS=js GOARCH=wasm go build -o build/app.wasm ./cmd/main.go
-
-install: go.sum
-	go install -mod=readonly ./cmd/hway
 
 ########################################
 ### Tools & dependencies
