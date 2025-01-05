@@ -4,7 +4,7 @@ project_name: sonr
 
 builds:
   - id: motr
-    main: ./cmd/motr
+    main: ./cmd/main.go
     binary: app
     goos:
       - js
