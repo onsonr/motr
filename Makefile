@@ -17,8 +17,7 @@ deps:
 	go install github.com/go-task/task/v3/cmd/task@latest
 
 build: go.sum
-	GOOS=js GOARCH=wasm go build -o build/app.wasm ./cmd/main.go
-
+	GOOS=js GOARCH=wasm go build -o build/app.wasm .
 ########################################
 ### Tools & dependencies
 ########################################
