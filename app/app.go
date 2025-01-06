@@ -5,9 +5,9 @@ package vault
 import (
 	"github.com/labstack/echo/v4"
 	echomiddleware "github.com/labstack/echo/v4/middleware"
-	"github.com/onsonr/motr/app/context"
-	motr "github.com/onsonr/motr/config"
-	motrorm "github.com/onsonr/motr/internal/models"
+	motr "github.com/onsonr/motr/pkg/config"
+	"github.com/onsonr/motr/pkg/context"
+	motrorm "github.com/onsonr/motr/pkg/models"
 )
 
 type Vault = *echo.Echo

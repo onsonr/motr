@@ -1,8 +1,8 @@
 // Cache names for different types of resources
 const CACHE_NAMES = {
-  wasm: 'wasm-cache-v1',
-  static: 'static-cache-v1',
-  dynamic: 'dynamic-cache-v1'
+  wasm: "wasm-cache-v1",
+  static: "static-cache-v1",
+  dynamic: "dynamic-cache-v1",
 };
 
 // Import required scripts
@@ -12,7 +12,9 @@ importScripts(
 );
 
 // Initialize WASM HTTP listener
-const wasmInstance = registerWasmHTTPListener("https://cdn.sonr.id/wasm/app.wasm");
+const wasmInstance = registerWasmHTTPListener(
+  "https://cdn.sonr.id/wasm/app.wasm",
+);
 
 // MessageChannel port for WASM communication
 let wasmPort;
@@ -21,8 +23,8 @@ let wasmPort;
 let requestQueue = new Map();
 
 // Setup message channel handler
-self.addEventListener('message', async (event) => {
-  if (event.data.type === 'PORT_INITIALIZATION') {
+self.addEventListener("message", async (event) => {
+  if (event.data.type === "PORT_INITIALIZATION") {
     wasmPort = event.data.port;
     setupWasmCommunication();
   }
@@ -33,17 +35,17 @@ function setupWasmCommunication() {
     const { type, data } = event.data;
 
     switch (type) {
-      case 'WASM_REQUEST':
+      case "WASM_REQUEST":
         handleWasmRequest(data);
         break;
-      case 'SYNC_REQUEST':
+      case "SYNC_REQUEST":
         processSyncQueue();
         break;
     }
   };
 
   // Notify that WASM is ready
-  wasmPort.postMessage({ type: 'WASM_READY' });
+  wasmPort.postMessage({ type: "WASM_READY" });
 }
 
 // Enhanced install event
@@ -52,13 +54,15 @@ self.addEventListener("install", (event) => {
     Promise.all([
       skipWaiting(),
       // Cache WASM binary and essential resources
-      caches.open(CACHE_NAMES.wasm).then(cache =>
-        cache.addAll([
-          'https://cdn.sonr.id/wasm/app.wasm',
-          'https://cdn.jsdelivr.net/gh/golang/go@go1.22.5/misc/wasm/wasm_exec.js'
-        ])
-      )
-    ])
+      caches
+        .open(CACHE_NAMES.wasm)
+        .then((cache) =>
+          cache.addAll([
+            "https://cdn.sonr.id/wasm/app.wasm",
+            "https://cdn.jsdelivr.net/gh/golang/go@go1.22.5/misc/wasm/wasm_exec.js",
+          ]),
+        ),
+    ]),
   );
 });
 
@@ -68,25 +72,25 @@ self.addEventListener("activate", (event) => {
     Promise.all([
       clients.claim(),
       // Clean up old caches
-      caches.keys().then(keys =>
+      caches.keys().then((keys) =>
         Promise.all(
-          keys.map(key => {
+          keys.map((key) => {
             if (!Object.values(CACHE_NAMES).includes(key)) {
               return caches.delete(key);
             }
-          })
-        )
-      )
-    ])
+          }),
+        ),
+      ),
+    ]),
   );
 });
 
 // Intercept fetch events
-self.addEventListener('fetch', (event) => {
+self.addEventListener("fetch", (event) => {
   const request = event.request;
 
   // Handle API requests differently from static resources
-  if (request.url.includes('/api/')) {
+  if (request.url.includes("/api/")) {
     event.respondWith(handleApiRequest(request));
   } else {
     event.respondWith(handleStaticRequest(request));
@@ -113,22 +117,16 @@ async function handleApiRequest(request) {
     }
 
     // Return offline response
-    return new Response(
-      JSON.stringify({ error: 'Currently offline' }),
-      {
-        status: 503,
-        headers: { 'Content-Type': 'application/json' }
-      }
-    );
+    return new Response(JSON.stringify({ error: "Currently offline" }), {
+      status: 503,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error) {
     await queueRequest(request);
-    return new Response(
-      JSON.stringify({ error: 'Request failed' }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      }
-    );
+    return new Response(JSON.stringify({ error: "Request failed" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }
 
@@ -151,8 +149,8 @@ async function handleStaticRequest(request) {
     return response;
   } catch (error) {
     // Return offline page for navigation requests
-    if (request.mode === 'navigate') {
-      return caches.match('/offline.html');
+    if (request.mode === "navigate") {
+      return caches.match("/offline.html");
     }
     throw error;
   }
@@ -169,15 +167,15 @@ async function processWasmResponse(request, response) {
     // Notify client through message channel
     if (wasmPort) {
       wasmPort.postMessage({
-        type: 'RESPONSE',
-        requestId: request.headers.get('X-Wasm-Request-ID'),
-        response: processedResponse
+        type: "RESPONSE",
+        requestId: request.headers.get("X-Wasm-Request-ID"),
+        response: processedResponse,
       });
     }
 
     return processedResponse;
   } catch (error) {
-    console.error('WASM processing error:', error);
+    console.error("WASM processing error:", error);
     return response;
   }
 }
@@ -188,9 +186,9 @@ async function queueRequest(request) {
 
   // Register for background sync
   try {
-    await self.registration.sync.register('wasm-sync');
+    await self.registration.sync.register("wasm-sync");
   } catch (error) {
-    console.error('Sync registration failed:', error);
+    console.error("Sync registration failed:", error);
   }
 }
 
@@ -205,13 +203,13 @@ async function serializeRequest(request) {
     method: request.method,
     headers,
     body: await request.text(),
-    timestamp: Date.now()
+    timestamp: Date.now(),
   };
 }
 
 // Handle background sync
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'wasm-sync') {
+self.addEventListener("sync", (event) => {
+  if (event.tag === "wasm-sync") {
     event.waitUntil(processSyncQueue());
   }
 });
@@ -221,11 +219,13 @@ async function processSyncQueue() {
 
   for (const serializedRequest of requests) {
     try {
-      const response = await fetch(new Request(serializedRequest.url, {
-        method: serializedRequest.method,
-        headers: serializedRequest.headers,
-        body: serializedRequest.body
-      }));
+      const response = await fetch(
+        new Request(serializedRequest.url, {
+          method: serializedRequest.method,
+          headers: serializedRequest.headers,
+          body: serializedRequest.body,
+        }),
+      );
 
       if (response.ok) {
         requestQueue.delete(serializedRequest.url);
@@ -233,13 +233,13 @@ async function processSyncQueue() {
         // Notify client of successful sync
         if (wasmPort) {
           wasmPort.postMessage({
-            type: 'SYNC_COMPLETE',
-            url: serializedRequest.url
+            type: "SYNC_COMPLETE",
+            url: serializedRequest.url,
           });
         }
       }
     } catch (error) {
-      console.error('Sync failed for request:', error);
+      console.error("Sync failed for request:", error);
     }
   }
 }
@@ -250,9 +250,8 @@ self.addEventListener("canmakepayment", function (e) {
 });
 
 // Handle periodic sync if available
-self.addEventListener('periodicsync', (event) => {
-  if (event.tag === 'wasm-sync') {
+self.addEventListener("periodicsync", (event) => {
+  if (event.tag === "wasm-sync") {
     event.waitUntil(processSyncQueue());
   }
 });
-

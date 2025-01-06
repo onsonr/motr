@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/ipfs/boxo/files"
-	motr "github.com/onsonr/motr/config"
+	motr "github.com/onsonr/motr/pkg/config"
 )
 
 const SchemaVersion = 1
