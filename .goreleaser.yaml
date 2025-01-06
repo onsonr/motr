@@ -2,9 +2,15 @@
 version: 2
 project_name: sonr
 
+hooks:
+  before:
+    - export RELEASE_DATE="$(date +%Y).$(date +%V).$(date +%u)"
+    - echo "Release date is $RELEASE_DATE"
+
+
 builds:
   - id: motr
-    main: ./cmd/main.go
+    main: ./cmd/vault/main.go
     binary: app
     goos:
       - js
